@@ -39,7 +39,6 @@ class LianJiaSpider(scrapy.Spider):
         jres = json.loads(response.body)
         for data in jres['data']['list']:
             item = ApartmentItem.create_or_update(data)
-
             yield item
 
 

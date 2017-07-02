@@ -10,7 +10,5 @@ from spider.items import ApartmentItem
 class ApartmentPipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, ApartmentItem):
-            spider.log('save a new instance')
-            spider.log(item)
             item.save()
         return item
