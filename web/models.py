@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 from django.db import models
 
 SH = 1
@@ -27,7 +26,7 @@ class Apartment(models.Model):
     lift_scale = models.CharField(max_length=20, null=True)
     look_count = models.IntegerField(null=True)
     metro_remark = models.CharField(max_length=100, null=True)
-    _online_time = models.DateTimeField(db_column='online_time', null=True)
+    online_time = models.DateTimeField(null=True)
     plate_id = models.IntegerField(null=True)
     plate_name = models.CharField(max_length=50, null=True)
     private_bathroom = models.IntegerField(null=True)
@@ -38,14 +37,3 @@ class Apartment(models.Model):
     room = models.IntegerField(null=True)
     web_url = models.CharField(max_length=200, null=True)
     tags = models.CharField(max_length=500, null=True)
-
-    @property
-    def online_time(self):
-        return self.online_time
-
-    @online_time.setter
-    def online_time(self, val):
-        if isinstance(val, datetime):
-            self._online_time = val
-        else:
-            self._online_time = datetime.fromtimestamp(val / 1e3)
