@@ -27,6 +27,7 @@ class Apartment(models.Model):
     look_count = models.IntegerField(null=True)
     metro_remark = models.CharField(max_length=100, null=True)
     online_time = models.DateTimeField(null=True)
+    rent_city_code = models.CharField(max_length=20, null=True)
     plate_id = models.IntegerField(null=True)
     plate_name = models.CharField(max_length=50, null=True)
     private_bathroom = models.IntegerField(null=True)
