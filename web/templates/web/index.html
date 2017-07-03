@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+
+</head>
+<body>
+<div class="ui grid">
+    <div class="three wide column">
+        <div class="ui secondary vertical menu">
+
+            {% for apt in apts %}
+                <a href="{{ apt.web_url }}" target="room" class="item">
+                    price: {{ apt.rent_price }} |
+                    square: {{ apt.acreage }} |
+                    id: {{ apt.id }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="thirteen wide column">
+        <iframe name="room" width="100%" height="900px"></iframe>
+    </div>
+</div>
+
+
+</body>
+</html>
