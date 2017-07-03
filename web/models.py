@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from datetime import datetime, timedelta
 from django.db import models
+from django.db.models import Q
 
 SH = 1
 # Create your models here.
@@ -38,3 +40,15 @@ class Apartment(models.Model):
     room = models.IntegerField(null=True)
     web_url = models.CharField(max_length=200, null=True)
     tags = models.CharField(max_length=500, null=True)
+
+    @classmethod
+    def good_room(cls):
+        return cls.objects.filter(
+            rent_price__lte=4000
+        ).filter(
+            rent_city_code='shz'
+        ).filter(
+            Q(district_name__contains="普陀") | Q(district_name__contains='静安') |
+            Q(district_name__contains="长宁") | Q(district_name__contains="徐汇") |
+            Q(district_name__contains="闸北")
+        ).order_by('-online_time')

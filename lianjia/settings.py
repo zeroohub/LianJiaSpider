@@ -128,3 +128,8 @@ EMAIL_PORT = '587'
 EMAIL_HOST_USER = u''
 EMAIL_HOST_PASSWORD = u''
 EMAIL_USE_TLS = True
+
+
+CRONJOBS = [
+    ('* */1 * * *', 'web.crons.email_new_apartment')
+]
