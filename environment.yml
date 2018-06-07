@@ -21,4 +21,6 @@ dependencies:
   - pip:
     - scrapy==1.5.0
     - python-telegram-bot==10.1.0
+    - ipython==5.7.0
+    - mongoengine==0.15.0
 prefix: /usr/local/miniconda2/envs/lianjiaspider
