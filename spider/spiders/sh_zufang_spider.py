@@ -4,37 +4,52 @@ from __future__ import unicode_literals
 import scrapy
 import json
 
-district_url = 'http://soa.dooioo.com/api/v4/online/house/rent/listMapResult?access_token=7poanTTBCymmgE0FOn1oKp&client=pc&cityCode=sh&siteType=quyu&type=district&dataId=sh&showType=list&limit_count=2000'
-plate_url = 'http://soa.dooioo.com/api/v4/online/house/rent/listMapResult?access_token=7poanTTBCymmgE0FOn1oKp&client=pc&cityCode=sh&siteType=quyu&type=plate&dataId={district_name}&showType=list&limit_count=2000'
-village_url = 'http://soa.dooioo.com/api/v4/online/house/rent/listMapResult?access_token=7poanTTBCymmgE0FOn1oKp&client=pc&cityCode=sh&siteType=quyu&type=village&dataId={village_name}&showType=list&limit_count=2000'
-community_url = 'http://soa.dooioo.com/api/v4/online/rent/zufang/search?access_token=7poanTTBCymmgE0FOn1oKp&client=pc&cityCode=sh&community_id={community_id}&limit_offset=1&limit_count=100'
+city_detail_url = 'https://ajax.lianjia.com/ajax/card/cityZufang?id={city_id}'
+district_list_url = 'https://ajax.lianjia.com/ajax/mapsearch/area/districtZufang?city_id={city_id}'
+district_detail_url = 'https://ajax.lianjia.com/ajax/card/districtZufang?id={district_id}'
+bizcircle_list_url = 'https://ajax.lianjia.com/ajax/mapsearch/area/bizcircleZufang?city_id={city_id}'
+bizcircle_detail_url = 'https://ajax.lianjia.com/ajax/card/bizcircleZufang?id={bizcircle_id}'
+bizcircle_house_list_url = ('https://ajax.lianjia.com/ajax/housesell/area/bizcircleZufang?'
+                            'ids={bizcircle_ids}&'
+                            'limit_offset={offset}&limit_count={count}&city_id={city_id}')
+house_url = 'https://{city_code}.lianjia.com/zufang/{house_code}.html'
+
 
 class LianJiaSpider(scrapy.Spider):
     name = 'lianjia'
+    city_id = 310000
+    city_code = 'sh'
 
-    start_urls = [district_url]
+    def start_requests(self):
+        urls = [
+            bizcircle_list_url.format(city_id=self.city_id)
+        ]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        jres = json.loads(response.body)
+        body = json.loads(response.body)
+        if len(body['data']) == 0:
+            raise Exception
 
-        for data in jres['dataList']:
-            current_type = data['currentType']
-            if current_type == 'village':
-                next_page = community_url.format(community_id=data['dataId'])
-                yield response.follow(next_page, self.parse_community)
-            else:
-                if current_type == 'district':
-                    next_page = plate_url.format(district_name=data['dataId'])
-                elif current_type == 'plate':
-                    next_page = village_url.format(village_name=data['dataId'])
-                else:
-                    next_page = None
-                yield response.follow(next_page, self.parse)
+        for bizcircle in body['data']:
+            total = bizcircle['house_count']
+            step = 100
+            for offset in range(0, total, step):
+                count = min(step, total)
+                next_page = bizcircle_house_list_url.format(
+                    bizcircle_ids=bizcircle['id'],
+                    count=count,
+                    offset=offset,
+                    city_id=self.city_id
+                )
+                yield response.follow(next_page, callback=self.parse_house)
 
-    def parse_community(self, response):
-        jres = json.loads(response.body)
-        for data in jres['data']['list']:
-            # item = ApartmentItem.create_or_update(data)
-            yield data
-
+    def parse_house(self, response):
+        body = json.loads(response.body)
+        for house in body['data'].get('list', []):
+            if house['house_code'][:2].upper() != self.city_code.upper():
+                yield {
+                    'house_url': house_url.format(city_code=self.city_code,
+                                                  house_code=house['house_code'])}
 
