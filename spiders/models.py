@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from mongoengine import *
 
-class Apartment(EmbeddedDocument):
-    id = StringField()
+
+class Apartment(Document):
+    id = StringField(primary_key=True)
     bedrooms = IntField(min_value=0)
     halls = IntField(min_value=0)
     is_ziroom = BooleanField()
@@ -11,19 +12,35 @@ class Apartment(EmbeddedDocument):
     area = FloatField()
     title = StringField()
 
-class District(EmbeddedDocument):
-    pass
+    community_id = IntField()
+    community_name = StringField()
 
-class Bizcircle(EmbeddedDocument):
-    pass
+    district_id = IntField()
+    district_name = StringField()
 
-class Community(EmbeddedDocument):
-    id = IntField()
-    name = StringField()
-    apartments = DictField()
+    bizcircle_id = IntField()
+    bizcircle_name = StringField()
 
 
-class City(Document):
-    code = StringField()
-    id = IntField()
-
+# class Community(EmbeddedDocument):
+#     id = IntField(primary_key=True)
+#     name = StringField()
+#     apartments = ListField(EmbeddedDocumentField(Apartment))
+#
+#
+# class Bizcircle(EmbeddedDocument):
+#     id = IntField(primary_key=True)
+#     name = StringField()
+#     communities = ListField(EmbeddedDocumentField(Community))
+#
+# class District(EmbeddedDocument):
+#     id = IntField(primary_key=True)
+#     name = StringField()
+#     bizcircles = ListField(EmbeddedDocumentField(Bizcircle))
+#
+#
+# class City(Document):
+#     id = IntField(primary_key=True)
+#     code = StringField()
+#     name = StringField()
+#     districts = ListField(EmbeddedDocumentField(District))
