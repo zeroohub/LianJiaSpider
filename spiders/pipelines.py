@@ -92,7 +92,7 @@ class CustomFilterPipeline(object):
     def notify(self):
 
         chat_id = 525052106
-        token = '566582636:AAFN2YxeWsv_VeLiVM-jyZt9JwQ5GIvBREo'
+        token = ''
         bot = telegram.Bot(token=token)
         content = u"new house:\n"
         for house in self.added_apartments:
