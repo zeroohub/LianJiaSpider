@@ -82,8 +82,7 @@ class CustomFilterPipeline(object):
         return item
 
     def house_good(self, house):
-        if ('subway_station' in house
-                and not int(house['is_ziroom'])
+        if (not int(house['is_ziroom'])
                 and int(house["frame_bedroom_num"]) >= 2
                 and int(house["price_total"]) <= 6000):
 
@@ -105,9 +104,9 @@ class CustomFilterPipeline(object):
                 house['frame_hall_num'],
                 house['price_total'],
                 house['rent_area'],
-                house['subway_station']['line_name'],
-                house['subway_station']['station_name'],
-                house['subway_station']['distance'],
+                house.get('subway_station', {}).get('line_name', ""),
+                house.get('subway_station', {}).get('station_name', ""),
+                house.get('subway_station', {}).get('distance', ""),
                 'https://sh.lianjia.com/zufang/{}.html'.format(house['house_code'])
             )
         bot.send_message(chat_id, content)
@@ -122,9 +121,9 @@ class CustomFilterPipeline(object):
                 house['frame_hall_num'],
                 house['price_total'],
                 house['rent_area'],
-                house['subway_station']['line_name'],
-                house['subway_station']['station_name'],
-                house['subway_station']['distance'],
+                house.get('subway_station', {}).get('line_name', ""),
+                house.get('subway_station', {}).get('station_name', ""),
+                house.get('subway_station', {}).get('distance', ""),
                 'https://sh.lianjia.com/zufang/{}.html'.format(house['house_code'])
             )
         bot.send_message(chat_id, content)
