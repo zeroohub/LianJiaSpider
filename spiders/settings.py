@@ -53,9 +53,10 @@ NEWSPIDER_MODULE = 'spiders.spiders'
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'spiders.middlewares.MyCustomDownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+   'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 100,
+   'scrapy.downloadermiddlewares.retry.RetryMiddleware': 200,
+}
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -66,8 +67,8 @@ NEWSPIDER_MODULE = 'spiders.spiders'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'spiders.pipelines.MongoDBPipeline': 900,
-   'spiders.pipelines.CustomFilterPipeline': 901,
+   # 'spiders.pipelines.MongoDBPipeline': 900,
+   # 'spiders.pipelines.CustomFilterPipeline': 901,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -90,3 +91,8 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+RETRY_ENABLED = True
+RETRY_TIMES = 5
+
+DOWNLOAD_TIMEOUT = 5
