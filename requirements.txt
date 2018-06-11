@@ -2,3 +2,4 @@ Scrapy==1.5.0
 python-telegram-bot==10.1.0
 ipython==5.7.0
 mongoengine==0.15.0
+python-dotenv==0.8.2
