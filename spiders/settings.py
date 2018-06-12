@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from env import MONGO_DB, MONGO_URI
 # Scrapy settings for spiders project
 #
 # For simplicity, this file contains only settings considered important or
@@ -12,8 +12,8 @@
 
 BOT_NAME = 'spiders'
 
-SPIDER_MODULES = ['spiders.rent_spiders']
-NEWSPIDER_MODULE = 'spiders.rent_spiders'
+SPIDER_MODULES = ['spiders.lianjia_spiders']
+NEWSPIDER_MODULE = 'spiders.lianjia_spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -53,8 +53,8 @@ NEWSPIDER_MODULE = 'spiders.rent_spiders'
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
-}
+# DOWNLOADER_MIDDLEWARES = {
+# }
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -65,8 +65,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   # 'spiders.pipelines.MongoDBPipeline': 900,
-   # 'spiders.pipelines.CustomFilterPipeline': 901,
+   'spiders.pipelines.FormatPipeline': 900,
+   'spiders.pipelines.MongoPipeline': 901,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

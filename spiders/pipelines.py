@@ -4,28 +4,13 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
+import uuid
+from datetime import datetime
+
 import pymongo
 import telegram
 
-
-class MongoDBPipeline(object):
-
-    def __init__(self, mongo_uri, mongo_db):
-        self.mongo_uri = mongo_uri
-        self.mongo_db = mongo_db
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-            mongo_uri=crawler.settings.get('MONGO_URI'),
-            mongo_db=crawler.settings.get('MONGO_DATABASE', 'lianjia_sh')
-        )
-
-    def open_spider(self, spider):
-        self.client = pymongo.MongoClient()
-        self.db = self.client.lianjia_sh
-        self.apartments = self.db.apartments
-
+class FormatPipeline(object):
     def process_item(self, item, spider):
         district = item['district']
         bizcircle = item['bizcircle']
@@ -35,44 +20,43 @@ class MongoDBPipeline(object):
         house['district_name'] = district['name']
         house['bizcircle_id'] = bizcircle['id']
         house['bizcircle_name'] = bizcircle['name']
-        house['started'] = item['started']
-
-        # result = {
-        #     'id': city['id'],
-        #     'name': city['name'],
-        #     'code': city['code'],
-        #     'districts': {
-        #         district['id']: {
-        #             'id': district['id'],
-        #             'name': district['name'],
-        #             'bizcircles': {
-        #                 bizcircle['id']: {
-        #                     'id': bizcircle['id'],
-        #                     'name': bizcircle['name'],
-        #                     'communities': {
-        #                         house['community_id']: {
-        #                             'id': house['community_id'],
-        #                             'name': house['community_name'],
-        #                             'apartments': {
-        #                                 house['house_code']: {k: v for k, v in house.iteritems() if k not in (
-        #                                     'community_id',
-        #                                     'community_name'
-        #                                 )}
-        #                             }
-        #                         }
-        #                     }
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }
-        self.apartments.insert_one(house)
         return house
+
+
+class MongoPipeline(object):
+
+    def __init__(self, mongo_uri, mongo_db, stats):
+        self.mongo_uri = mongo_uri
+        self.mongo_db = mongo_db
+        stats.set_value('crawl_id', uuid.uuid4().hex)
+        self.stats = stats
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get('MONGO_URI'),
+            mongo_db=crawler.settings.get('MONGO_DATABASE', 'rent_house'),
+            stats=crawler.stats
+        )
+
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+
+    def process_item(self, item, spider):
+        apartments = self.db.apartments
+        house = {
+            'start_time': self.stats.get_value('start_time'),
+            'crawl_id': self.stats.get_value('crawl_id'),
+            'created': datetime.now()
+        }
+        house.update(item)
+        apartments.insert_one(house)
+        return item
 
     def close_spider(self, spider):
         logs = self.db.logs
-        logs.insert_one({'started': spider.started, 'status': 'succeed'})
-
+        logs.insert_one(self.stats.get_stats())
         self.client.close()
 
 
