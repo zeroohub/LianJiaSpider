@@ -12,8 +12,8 @@
 
 BOT_NAME = 'spiders'
 
-SPIDER_MODULES = ['spiders.spiders']
-NEWSPIDER_MODULE = 'spiders.spiders'
+SPIDER_MODULES = ['spiders.rent_spiders']
+NEWSPIDER_MODULE = 'spiders.rent_spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -54,8 +54,6 @@ NEWSPIDER_MODULE = 'spiders.spiders'
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 100,
-   'scrapy.downloadermiddlewares.retry.RetryMiddleware': 200,
 }
 
 # Enable or disable extensions
