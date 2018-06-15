@@ -6,9 +6,11 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import uuid
 from datetime import datetime
-
 import pymongo
-import telegram
+
+def bson_clean_key(d):
+    return {str(k).replace('.', '__'): v for k, v in d.iteritems()}
+
 
 class FormatPipeline(object):
     def process_item(self, item, spider):
@@ -56,7 +58,8 @@ class MongoPipeline(object):
 
     def close_spider(self, spider):
         logs = self.db.logs
-        logs.insert_one(self.stats.get_stats())
+
+        logs.insert_one(bson_clean_key(self.stats.get_stats()))
         self.client.close()
 
 
