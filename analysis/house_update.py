@@ -59,3 +59,5 @@ def check_new_houses():
     notify(added_apartments, removed_apartments)
 
 
+if __name__ == '__main__':
+    check_new_houses()
