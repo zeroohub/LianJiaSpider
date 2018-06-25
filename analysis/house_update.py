@@ -5,8 +5,15 @@ from env import MONGO_URI, MONGO_DB
 
 def house_good(house):
     if ('subway_station' in house
-            and house.get('subway_station', {}).get('station_name', "") in (
-                    u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村')
+            and house['district_name'] in (
+                u'静安',
+                u'黄浦',
+                u'虹口',
+                u'杨浦',
+                u'闸北',
+            )
+            # and house.get('subway_station', {}).get('station_name', "") in (
+            #         u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村')
             and not int(house['is_ziroom'])
             and int(house["frame_bedroom_num"]) >= 1
             and int(house["price_total"]) <= 6000):
