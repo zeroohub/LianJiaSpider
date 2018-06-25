@@ -6,6 +6,7 @@ from env import MONGO_URI, MONGO_DB
 def house_good(house):
     if ('subway_station' in house
             and house['subway_station']['line_name'] == u'10号线'
+            and house['district_name'] in (u'虹口', u'闸北', u'黄浦')
             # and house.get('subway_station', {}).get('station_name', "") in (
             #         u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村')
             and not int(house['is_ziroom'])
