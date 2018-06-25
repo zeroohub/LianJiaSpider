@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-
+import logging
 import telegram
 from telegram.ext import Updater, CommandHandler
 from env import TELEGRAM_BOT_TOKEN
 chat_id = 525052106
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
 
 def send_message(text):
     bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
@@ -18,7 +22,7 @@ def get_houses(bot, update):
 def start_listen():
     updater = Updater(token=TELEGRAM_BOT_TOKEN)
     dispatcher = updater.dispatcher
-    get_houses_handler = CommandHandler('get_houses', get_houses)
+    get_houses_handler = CommandHandler('get', get_houses)
     dispatcher.add_handler(get_houses_handler)
     updater.start_polling()
 
