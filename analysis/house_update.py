@@ -6,19 +6,23 @@ from env import MONGO_URI, MONGO_DB
 def house_good(house):
     if ('subway_station' in house
             and house['rent_area'] > 50
-            and house['subway_station']['line_name'] in (u'10号线', )
-            and house['district_name'] in (u'虹口', u'闸北', u'黄浦')
-            # and house.get('subway_station', {}).get('station_name', "") in (
-            #         u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村')
+            # and house['subway_station']['line_name'] in (u'10号线', )
+            # and house['district_name'] in (u'虹口', u'闸北', u'黄浦')
+            and house.get('subway_station', {}).get('station_name', "") in (
+                    u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村',
+                u'曲阜路', u'宝山路', u'东宝兴路', u'南京东路', u'豫园', u'老西门'
+            )
             and not int(house['is_ziroom'])
             and int(house["frame_bedroom_num"]) >= 1
             and int(house["price_total"]) <= 6000):
         return True
     return False
 
+
 def chunk_list(l, n):
     for i in range(0, len(l), n):
-        yield l[i:i+n]
+        yield l[i:i + n]
+
 
 def houses2str(houses):
     chunks = chunk_list(houses, 10)
