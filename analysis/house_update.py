@@ -1,34 +1,42 @@
 # -*- coding: utf-8 -*-
 import pymongo
 from env import MONGO_URI, MONGO_DB
-from notfication.telegram_bot import send_message
 
 
 def house_good(house):
     if ('subway_station' in house
+            and house.get('subway_station', {}).get('station_name', "") in (
+                    u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村')
             and not int(house['is_ziroom'])
-            and int(house["frame_bedroom_num"]) >= 2
+            and int(house["frame_bedroom_num"]) >= 1
             and int(house["price_total"]) <= 6000):
         return True
     return False
 
 
+def houses2str(houses):
+    content = u""
+    for house in houses:
+        content += u"{}|{}|{}: {}室{}厅 {}元 {}平米 距离{}{}站{}米, 链接: {}\n".format(
+            house['district_name'],
+            house['bizcircle_name'],
+            house['community_name'],
+            house['frame_bedroom_num'],
+            house['frame_hall_num'],
+            house['price_total'],
+            house['rent_area'],
+            house.get('subway_station', {}).get('line_name', ""),
+            house.get('subway_station', {}).get('station_name', ""),
+            house.get('subway_station', {}).get('distance', ""),
+            'https://sh.lianjia.com/zufang/{}.html'.format(house['house_code'])
+        )
+    return content
+
+
 def notify(added, removed):
-    for houses, content in [(added, u"new house:\n"), (removed, u'removed house:\n')]:
-        for house in houses:
-            content += u"{}|{}|{}: {}室{}厅 {}元 {}平米 距离{}{}站{}米, 链接: {}\n".format(
-                house['district_name'],
-                house['bizcircle_name'],
-                house['community_name'],
-                house['frame_bedroom_num'],
-                house['frame_hall_num'],
-                house['price_total'],
-                house['rent_area'],
-                house.get('subway_station', {}).get('line_name', ""),
-                house.get('subway_station', {}).get('station_name', ""),
-                house.get('subway_station', {}).get('distance', ""),
-                'https://sh.lianjia.com/zufang/{}.html'.format(house['house_code'])
-            )
+    for houses, content in [(added, u"新添加房:\n"), (removed, u'删除的房:\n')]:
+        content += houses2str(houses)
+        from notfication.telegram_bot import send_message
         send_message(content)
 
 
@@ -57,6 +65,18 @@ def check_new_houses():
             removed_apartments.append(house)
 
     notify(added_apartments, removed_apartments)
+
+
+def get_all_houses():
+    with pymongo.MongoClient(MONGO_URI) as client:
+        db = client[MONGO_DB]
+        apartments = db.apartments
+        logs = db.logs
+
+        crawl_log = logs.find().sort('start_time', pymongo.DESCENDING)[1]
+        added_apartments = [a for a in apartments.find(
+            {'crawl_id': crawl_log['crawl_id']}) if house_good(a)]
+        return houses2str(added_apartments)
 
 
 if __name__ == '__main__':
