@@ -5,13 +5,7 @@ from env import MONGO_URI, MONGO_DB
 
 def house_good(house):
     if ('subway_station' in house
-            and house['district_name'] in (
-                u'静安',
-                u'黄浦',
-                u'虹口',
-                u'杨浦',
-                u'闸北',
-            )
+            and house['subway_station']['line_name'] == u'10号线'
             # and house.get('subway_station', {}).get('station_name', "") in (
             #         u'南京东路', u'天潼路', u'四川北路', u'海伦路', u'邮电新村')
             and not int(house['is_ziroom'])
@@ -20,31 +14,39 @@ def house_good(house):
         return True
     return False
 
+def chunk_list(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
 
 def houses2str(houses):
-    content = u""
-    for house in houses:
-        content += u"{}|{}|{}: {}室{}厅 {}元 {}平米 距离{}{}站{}米, 链接: {}\n".format(
-            house['district_name'],
-            house['bizcircle_name'],
-            house['community_name'],
-            house['frame_bedroom_num'],
-            house['frame_hall_num'],
-            house['price_total'],
-            house['rent_area'],
-            house.get('subway_station', {}).get('line_name', ""),
-            house.get('subway_station', {}).get('station_name', ""),
-            house.get('subway_station', {}).get('distance', ""),
-            'https://sh.lianjia.com/zufang/{}.html'.format(house['house_code'])
-        )
-    return content
+    chunks = chunk_list(houses, 10)
+    content_list = []
+    for houses in chunks:
+        content = u""
+        for house in houses:
+            content += u"{}|{}|{}: {}室{}厅 {}元 {}平米 距离{}{}站{}米, 链接: {}\n".format(
+                house['district_name'],
+                house['bizcircle_name'],
+                house['community_name'],
+                house['frame_bedroom_num'],
+                house['frame_hall_num'],
+                house['price_total'],
+                house['rent_area'],
+                house.get('subway_station', {}).get('line_name', ""),
+                house.get('subway_station', {}).get('station_name', ""),
+                house.get('subway_station', {}).get('distance', ""),
+                'https://sh.lianjia.com/zufang/{}.html'.format(house['house_code'])
+            )
+        content_list.append(content)
+    return content_list
 
 
 def notify(added, removed):
+    from notfication.telegram_bot import send_message
     for houses, content in [(added, u"新添加房:\n"), (removed, u'删除的房:\n')]:
-        content += houses2str(houses)
-        from notfication.telegram_bot import send_message
-        send_message(content)
+        for con in houses2str(houses):
+            content += con
+            send_message(content)
 
 
 def check_new_houses():
