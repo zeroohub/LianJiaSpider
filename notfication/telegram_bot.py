@@ -16,7 +16,8 @@ def send_message(text):
 
 def get_houses(bot, update):
     from analysis.house_update import get_all_houses
-    bot.send_message(chat_id=update.message.chat_id, text=get_all_houses())
+    for content in get_all_houses():
+        bot.send_message(chat_id=update.message.chat_id, text=content)
 
 
 def start_listen():
